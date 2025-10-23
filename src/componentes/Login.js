@@ -10,14 +10,19 @@ const Login = () => {
   const [contrasena, setContrasena] = useState('');
   const navigate = useNavigate();
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3001/api/login', { usuario, contrasena });
-      localStorage.setItem('usuario', usuario); 
-      navigate('/ponystore');
+      const response = await axios.post(`${API_URL}/api/login`, { usuario, contrasena });
+      if (response.data) {
+        localStorage.setItem('usuario', usuario);
+        navigate('/ponystore');
+      }
     } catch (error) {
-      alert('Usuario o contraseña incorrectos.');
+      const errorMessage = error.response?.data?.message || 'Error al iniciar sesión. Por favor, intente nuevamente.';
+      alert(errorMessage);
     }
   };
 
