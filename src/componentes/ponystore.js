@@ -7,6 +7,8 @@ const PonyStore = () => {
   const [currentUser] = useState(localStorage.getItem('usuario'));
   const navigate = useNavigate();
 
+  
+
   // Estados para el formulario de agregar
   const [nuevoUsuario, setNuevoUsuario] = useState('');
   const [nuevaContrasena, setNuevaContrasena] = useState('');

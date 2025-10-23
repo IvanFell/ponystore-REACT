@@ -180,3 +180,37 @@ video {
     font-size: 1em;
     padding: 0;
 }
+
+
+/* == ESTILOS PARA LA PÁGINA DE BIENVENIDA (HOMEPONY) */
+
+
+/* Estilo para el encabezado donde va el logo */
+.page-header {
+    padding: 20px 40px; /* Espacio alrededor del logo */
+}
+
+.logo {
+    height: 50px; /* Altura del logo, ajústala si es necesario */
+}
+
+/* Contenedor principal del contenido */
+.content {
+    padding: 20px 40px;
+}
+
+/* Estilo para el título principal */
+.content h1 {
+    text-align: center; /* Centra el texto */
+    color: #BF3A3B;     /* Color rojo similar al de la imagen */
+    font-size: 2.5em;   /* Tamaño de la fuente */
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border-bottom: none; /* Quitamos el borde que tienen otros h1 */
+}
+
+/* Estilo para el párrafo de texto */
+.content p {
+    font-size: 1.1em;
+    color: #333333; /* Color de texto gris oscuro */
+}
