@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
- 
-  baseURL: 'https://ponystore-react.onrender.com/api', 
+  // Pega aquí TU URL del backend (la que dice 'api', NO 'react')
+  baseURL: 'https://ponystore-api.onrender.com/api', 
   headers: {
     'Content-Type': 'application/json'
   }
