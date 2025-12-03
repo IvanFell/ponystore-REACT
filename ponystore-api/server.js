@@ -1,4 +1,5 @@
 // ponystore-api/server.js
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
@@ -16,8 +17,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Configuración de la Base de Datos (Crucial para Render)
 const pool = new Pool({
-  // Si estamos en Render, usa la variable de entorno DATABASE_URL
-  // Si estamos en tu PC, usa la configuración local
   connectionString: process.env.DATABASE_URL || 'postgres://postgres:1234@localhost:5432/ponystore',
   ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false // SSL es obligatorio en Render
 });
@@ -88,7 +87,7 @@ app.get('/api/users', async (req, res) => {
 // Obtener productos
 app.get('/api/productos', async (req, res) => {
   try {
-    // Asegúrate de que la tabla se llame 'producto' en tu base de datos nueva
+   
     const result = await pool.query('SELECT * FROM producto ORDER BY id');
     res.json(result.rows);
   } catch (error) {

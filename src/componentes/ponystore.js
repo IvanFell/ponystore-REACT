@@ -23,7 +23,6 @@ const PonyStore = () => {
       setUsuarios(response.data);
     } catch (error) {
       console.error('Error al cargar usuarios:', error);
-      alert('Error al cargar usuarios. ¿Tu API está encendida?');
     }
   };
 
@@ -38,7 +37,6 @@ const PonyStore = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-   
     const datosUsuario = { nombre, email, rol };
     if (password || !editingId) { 
       datosUsuario.password = password;
@@ -47,32 +45,28 @@ const PonyStore = () => {
     try {
       if (editingId) {
         await actualizarUsuario(editingId, datosUsuario);
-        alert('Usuario actualizado con éxito');
+        alert('✅ Usuario actualizado con éxito');
       } else {
         if (!password) {
-          alert('La contraseña es obligatoria al crear un usuario');
+          alert('⚠️ La contraseña es obligatoria');
           return;
         }
         await crearUsuarioAdmin(datosUsuario);
-        alert('Usuario creado con éxito');
+        alert('✅ Usuario creado con éxito');
       }
       
       limpiarFormulario();
       cargarUsuarios(); 
 
     } catch (error) {
-        console.error('Error al guardar usuario:', error);
-        let mensajeError = 'Error al guardar usuario.';
-       
-        if (error.response && (error.response.data.message || error.response.data.error)) {
-            mensajeError = error.response.data.message || error.response.data.error;
-        }
-        alert(mensajeError);
+        console.error('Error detallado:', error);
+        // Capturamos el mensaje exacto que envía el servidor (ej: "Usuario ya existe")
+        const mensaje = error.response?.data?.message || 'Error desconocido al guardar.';
+        alert(`❌ Error: ${mensaje}`);
     }
   };
 
   const handleEditar = (user) => {
-    
     setEditingId(user.id); 
     setNombre(user.usuario); 
     setEmail(user.email || ''); 
@@ -81,27 +75,27 @@ const PonyStore = () => {
   };
 
   const handleEliminar = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+    if (window.confirm('¿Seguro que quieres eliminar este usuario? Esta acción no se puede deshacer.')) {
       try {
         await eliminarUsuario(id);
-        alert('Usuario eliminado');
+        alert('🗑️ Usuario eliminado correctamente');
         cargarUsuarios();
       } catch (error) {
-        console.error('Error al eliminar usuario:', error);
-        alert('Error al eliminar usuario');
+        console.error('Error al eliminar:', error);
+        const mensaje = error.response?.data?.message || 'No se pudo eliminar el usuario.';
+        alert(`❌ Error: ${mensaje}`);
       }
     }
   };
-
 
   return (
     <div className="container">
       <h1>Panel de Administración de Usuarios</h1>
       
-      <Link to="/">Ir a la Tienda (Home) &rarr;</Link>
+      <Link to="/" className="back-link">← Volver al Inicio</Link>
 
       <form onSubmit={handleSubmit} className="add-form">
-        <h3>{editingId ? 'Modificar Usuario' : 'Agregar Nuevo Usuario'}</h3>
+        <h3>{editingId ? '✏️ Modificar Usuario' : '➕ Agregar Nuevo Usuario'}</h3>
         <input 
           type="text" 
           placeholder="Nombre de Usuario" 
@@ -109,15 +103,16 @@ const PonyStore = () => {
           onChange={(e) => setNombre(e.target.value)} 
           required 
         />
+        {/* El email es visual, el backend no lo guarda por ahora */}
         <input 
           type="email" 
-          placeholder="Email (opcional, no se guarda)" 
+          placeholder="Email (opcional)" 
           value={email} 
           onChange={(e) => setEmail(e.target.value)} 
         />
         <input 
           type="password" 
-          placeholder={editingId ? 'Nueva contraseña (opcional)' : 'Contraseña'}
+          placeholder={editingId ? 'Nueva contraseña (dejar vacía para mantener)' : 'Contraseña'}
           value={password} 
           onChange={(e) => setPassword(e.target.value)} 
         />
@@ -126,48 +121,52 @@ const PonyStore = () => {
           <option value="admin">Administrador</option>
         </select>
         
-        <button type="submit">{editingId ? 'Actualizar' : 'Agregar'}</button>
-        {editingId && (
-          <button type="button" onClick={limpiarFormulario} className="button-cancel">
-            Cancelar Edición
-          </button>
-        )}
+        <div className="form-actions">
+            <button type="submit" className="button-save">
+                {editingId ? 'Actualizar' : 'Guardar Usuario'}
+            </button>
+            {editingId && (
+            <button type="button" onClick={limpiarFormulario} className="button-cancel">
+                Cancelar
+            </button>
+            )}
+        </div>
       </form>
 
-      <h2>Lista de Usuarios</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Usuario</th> 
-            <th>Rol</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-         
-          {usuarios.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.usuario}</td> 
-              <td>{user.rol}</td>
-              <td>
-                <button onClick={() => handleEditar(user)} className="button-update">
-                  Editar
-                </button>
-                <button onClick={() => handleEliminar(user.id)} className="button-delete">
-                  Eliminar
-                </button>
-              </td>
+      <h2>Lista de Usuarios Registrados</h2>
+      <div className="table-responsive">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuario</th> 
+                <th>Rol</th>
+                <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <video width="500" autoPlay muted loop>
-        <source src="https://videos.pexels.com/video-files/5495204/5495204-hd_1280_720_30fps.mp4" type="video/mp4" />
-        Tu navegador no soporta el video.
-      </video>
+            </thead>
+            <tbody>
+            {usuarios.map((user) => (
+                <tr key={user.id}>
+                <td>{user.id}</td>
+                <td>{user.usuario}</td> 
+                <td>
+                    <span className={`badge ${user.rol === 'admin' ? 'badge-admin' : 'badge-client'}`}>
+                        {user.rol}
+                    </span>
+                </td>
+                <td>
+                    <button onClick={() => handleEditar(user)} className="button-update">
+                    Editar
+                    </button>
+                    <button onClick={() => handleEliminar(user.id)} className="button-delete">
+                    Eliminar
+                    </button>
+                </td>
+                </tr>
+            ))}
+            </tbody>
+        </table>
+      </div>
     </div>
   );
 };
