@@ -178,3 +178,25 @@ app.get('/api/productos', async (req, res) => {
 app.listen(port, () => {
   console.log(`Servidor de API corriendo en el puerto ${port}`);
 });
+
+
+
+// Crear un nuevo producto
+app.post('/api/productos', async (req, res) => {
+  const { nombre, descripcion, precio, imagen } = req.body;
+
+  if (!nombre || !precio) {
+    return res.status(400).json({ message: 'Nombre y precio son obligatorios' });
+  }
+
+  try {
+    const result = await pool.query(
+      'INSERT INTO producto (nombre, descripcion, precio, imagen) VALUES ($1, $2, $3, $4) RETURNING *',
+      [nombre, descripcion, precio, imagen]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error('Error al crear producto:', error);
+    res.status(500).json({ message: 'Error en el servidor al guardar producto' });
+  }
+});

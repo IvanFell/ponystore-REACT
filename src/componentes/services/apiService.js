@@ -41,3 +41,8 @@ export const actualizarUsuario = (id, datosUsuario) => {
 export const eliminarUsuario = (id) => {
   return apiClient.delete(`/users/${id}`);
 };
+
+// Crear producto
+export const crearProducto = (datosProducto) => {
+  return apiClient.post('/productos', datosProducto);
+};

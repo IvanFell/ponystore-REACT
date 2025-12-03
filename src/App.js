@@ -8,6 +8,7 @@ import Login from './componentes/Login';
 import Registro from './componentes/Registro';
 import HomePony from './componentes/HomePony'; 
 import PonyStore from './componentes/ponystore';
+import AdminProductos from './componentes/AdminProductos';
 
 // Componentes nuevos
 
@@ -33,6 +34,7 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/catalogo" element={<Catalogo />} />
         <Route path="/ponystore" element={<PonyStore />} />
+        <Route path="/admin-productos" element={<AdminProductos />} />
       </Routes>
     </div>
   );
