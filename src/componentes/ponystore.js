@@ -10,10 +10,16 @@ const PonyStore = () => {
   const [email, setEmail] = useState(''); 
   const [password, setPassword] = useState('');
   const [rol, setRol] = useState('cliente');
-  
   const [editingId, setEditingId] = useState(null);
+
+  // Estado para saber quién está conectado
+  const [miRol, setMiRol] = useState('');
   
   useEffect(() => {
+    // 1. Leemos el rol del usuario actual desde el navegador
+    const rolGuardado = localStorage.getItem('userRole');
+    setMiRol(rolGuardado);
+
     cargarUsuarios();
   }, []);
 
@@ -36,7 +42,6 @@ const PonyStore = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     const datosUsuario = { nombre, email, rol };
     if (password || !editingId) { 
       datosUsuario.password = password;
@@ -54,13 +59,10 @@ const PonyStore = () => {
         await crearUsuarioAdmin(datosUsuario);
         alert('✅ Usuario creado con éxito');
       }
-      
       limpiarFormulario();
       cargarUsuarios(); 
-
     } catch (error) {
         console.error('Error detallado:', error);
-        // Capturamos el mensaje exacto que envía el servidor (ej: "Usuario ya existe")
         const mensaje = error.response?.data?.message || 'Error desconocido al guardar.';
         alert(`❌ Error: ${mensaje}`);
     }
@@ -75,14 +77,14 @@ const PonyStore = () => {
   };
 
   const handleEliminar = async (id) => {
-    if (window.confirm('¿Seguro que quieres eliminar este usuario? Esta acción no se puede deshacer.')) {
+    if (window.confirm('¿Seguro que quieres eliminar este usuario?')) {
       try {
         await eliminarUsuario(id);
         alert('🗑️ Usuario eliminado correctamente');
         cargarUsuarios();
       } catch (error) {
         console.error('Error al eliminar:', error);
-        const mensaje = error.response?.data?.message || 'No se pudo eliminar el usuario.';
+        const mensaje = error.response?.data?.message || 'No se pudo eliminar.';
         alert(`❌ Error: ${mensaje}`);
       }
     }
@@ -90,9 +92,19 @@ const PonyStore = () => {
 
   return (
     <div className="container">
-      <h1>Panel de Administración de Usuarios</h1>
+      <h1>Panel de Administración</h1>
       
-      <Link to="/" className="back-link">← Volver al Inicio</Link>
+      {/* BARRA DE NAVEGACIÓN ADMINISTRATIVA */}
+      <div className="admin-nav" style={{ marginBottom: '20px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <Link to="/" className="back-link">🏠 Ir al Inicio</Link>
+          
+          {/* ESTE BOTÓN SOLO LO VEN LOS ADMINS */}
+          {miRol === 'admin' && (
+            <Link to="/admin-productos" className="button-update" style={{ textDecoration: 'none', backgroundColor: '#28a745' }}>
+              📦 Gestionar Productos
+            </Link>
+          )}
+      </div>
 
       <form onSubmit={handleSubmit} className="add-form">
         <h3>{editingId ? '✏️ Modificar Usuario' : '➕ Agregar Nuevo Usuario'}</h3>
@@ -103,7 +115,6 @@ const PonyStore = () => {
           onChange={(e) => setNombre(e.target.value)} 
           required 
         />
-        {/* El email es visual, el backend no lo guarda por ahora */}
         <input 
           type="email" 
           placeholder="Email (opcional)" 
@@ -112,7 +123,7 @@ const PonyStore = () => {
         />
         <input 
           type="password" 
-          placeholder={editingId ? 'Nueva contraseña (dejar vacía para mantener)' : 'Contraseña'}
+          placeholder={editingId ? 'Nueva contraseña (opcional)' : 'Contraseña'}
           value={password} 
           onChange={(e) => setPassword(e.target.value)} 
         />
@@ -133,7 +144,7 @@ const PonyStore = () => {
         </div>
       </form>
 
-      <h2>Lista de Usuarios Registrados</h2>
+      <h2>Usuarios del Sistema</h2>
       <div className="table-responsive">
         <table>
             <thead>
